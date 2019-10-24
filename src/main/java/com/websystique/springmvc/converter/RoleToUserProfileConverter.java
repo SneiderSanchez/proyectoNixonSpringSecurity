@@ -10,7 +10,7 @@ import com.websystique.springmvc.model.UserProfile;
 import com.websystique.springmvc.service.UserProfileService;
 
 /**
- * A converter class used in views to map id's to actual userProfile objects.
+ * ES un convertidor para que en las vistas pueda ser mapeado el id del perfil de usuario  (userProfile) como un objeto .
  */
 @Component
 public class RoleToUserProfileConverter implements Converter<Object, UserProfile>{
@@ -21,8 +21,7 @@ public class RoleToUserProfileConverter implements Converter<Object, UserProfile
 	UserProfileService userProfileService;
 
 	/**
-	 * Gets UserProfile by Id
-	 * @see org.springframework.core.convert.converter.Converter#convert(java.lang.Object)
+	 * Trae la informacion del perfil de usuario		 
 	 */
 	public UserProfile convert(Object element) {
 		Integer id = Integer.parseInt((String)element);

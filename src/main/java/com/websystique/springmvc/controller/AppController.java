@@ -53,7 +53,7 @@ public class AppController {
 	
 	
 	/**
-	 * This method will list all existing users.
+	 * Metodo que listará los usuarios existentes para los usuarios que tengan permiso de administrador
 	 */
 	@RequestMapping(value = { "/", "/list" }, method = RequestMethod.GET)
 	public String listUsers(ModelMap model) {
@@ -65,7 +65,7 @@ public class AppController {
 	}
 
 	/**
-	 * This method will provide the medium to add a new user.
+	 * Metodo que maneja la creacion de un nuevo usuario
 	 */
 	@RequestMapping(value = { "/newuser" }, method = RequestMethod.GET)
 	public String newUser(ModelMap model) {
@@ -76,7 +76,7 @@ public class AppController {
 		return "registration";
 	}
         /**
-	 * This method will provide the medium to add a new user.
+	 * Este metodo muestra las ultimas donaciones realizadas por el donante
 	 */
 	@RequestMapping(value = { "/ultimasDonaciones" }, method = RequestMethod.GET)
 	public String lastDonations(ModelMap model) {
@@ -88,7 +88,7 @@ public class AppController {
 	}
         
         /**
-	 * This method will provide the medium to add a new user.
+	 * Este metodo muestra el estado de las donaciones aceptadas por la fundacion
 	 */
 	@RequestMapping(value = { "/estadoDonaciones" }, method = RequestMethod.GET)
 	public String donationsState(ModelMap model) {
@@ -99,8 +99,8 @@ public class AppController {
 		return "stateDonations";
 	}
 	/**
-	 * This method will be called on form submission, handling POST request for
-	 * saving user in database. It also validates the user input
+	 * Este metodo se llama cuando se envia el formulario para que controle las peticiones POST para guardar el usaurio en la base de datos
+         *
 	 */
 	@RequestMapping(value = { "/newuser" }, method = RequestMethod.POST)
 	public String saveUser(@Valid User user, BindingResult result,
@@ -111,12 +111,7 @@ public class AppController {
 		}
 
 		/*
-		 * Preferred way to achieve uniqueness of field [sso] should be implementing custom @Unique annotation 
-		 * and applying it on field [sso] of Model class [User].
-		 * 
-		 * Below mentioned peace of code [if block] is to demonstrate that you can fill custom errors outside the validation
-		 * framework as well while still using internationalized messages.
-		 * 
+		 * Condicional para verificar que el campo sso sea unico 
 		 */
 		if(!userService.isUserSSOUnique(user.getId(), user.getSsoId())){
 			FieldError ssoError =new FieldError("user","ssoId",messageSource.getMessage("non.unique.ssoId", new String[]{user.getSsoId()}, Locale.getDefault()));
@@ -134,7 +129,7 @@ public class AppController {
 
 
 	/**
-	 * This method will provide the medium to update an existing user.
+	 * Este metodo permite editar un usuario existente 
 	 */
 	@RequestMapping(value = { "/edit-user-{ssoId}" }, method = RequestMethod.GET)
 	public String editUser(@PathVariable String ssoId, ModelMap model) {
@@ -146,8 +141,7 @@ public class AppController {
 	}
 	
 	/**
-	 * This method will be called on form submission, handling POST request for
-	 * updating user in database. It also validates the user input
+	 * Este metodo permite el manejo del post de el formuario correspondiente a la edicion del usuario
 	 */
 	@RequestMapping(value = { "/edit-user-{ssoId}" }, method = RequestMethod.POST)
 	public String updateUser(@Valid User user, BindingResult result,
@@ -157,7 +151,8 @@ public class AppController {
 			return "registration";
 		}
 
-		/*//Uncomment below 'if block' if you WANT TO ALLOW UPDATING SSO_ID in UI which is a unique key to a User.
+		/*//Posible funcionalidad si se quiere permitir  que se modifique el sso 
+                del usuario que es unico en la base de datos y puede generar conflictos
 		if(!userService.isUserSSOUnique(user.getId(), user.getSsoId())){
 			FieldError ssoError =new FieldError("user","ssoId",messageSource.getMessage("non.unique.ssoId", new String[]{user.getSsoId()}, Locale.getDefault()));
 		    result.addError(ssoError);
@@ -174,7 +169,7 @@ public class AppController {
 
 	
 	/**
-	 * This method will delete an user by it's SSOID value.
+	 * Este metodo maneja la eliminacion de usuarios en la db
 	 */
 	@RequestMapping(value = { "/delete-user-{ssoId}" }, method = RequestMethod.GET)
 	public String deleteUser(@PathVariable String ssoId) {
@@ -184,7 +179,7 @@ public class AppController {
 	
 
 	/**
-	 * This method will provide UserProfile list to views
+	 * Este metodo se encarga de enviar el rol del usuario a las vistas
 	 */
 	@ModelAttribute("roles")
 	public List<UserProfile> initializeProfiles() {
@@ -192,7 +187,7 @@ public class AppController {
 	}
 	
 	/**
-	 * This method handles Access-Denied redirect.
+	 * Este metodo controla el reenvio a los usuarios que no estan autorizados
 	 */
 	@RequestMapping(value = "/Access_Denied", method = RequestMethod.GET)
 	public String accessDeniedPage(ModelMap model) {
@@ -201,8 +196,8 @@ public class AppController {
 	}
 
 	/**
-	 * This method handles login GET requests.
-	 * If users is already logged-in and tries to goto login page again, will be redirected to list page.
+	 * Este metodo se encarga del manejo de login, si el usuario ha sido logeado anteriormente 
+	 * lo reenviara a la ruta "/"
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String loginPage() {
@@ -214,8 +209,7 @@ public class AppController {
 	}
 
 	/**
-	 * This method handles logout requests.
-	 * Toggle the handlers if you are RememberMe functionality is useless in your app.
+	 * Este metodo controla el cierre de sesion de los usuarios
 	 */
 	@RequestMapping(value="/logout", method = RequestMethod.GET)
 	public String logoutPage (HttpServletRequest request, HttpServletResponse response){
@@ -229,7 +223,7 @@ public class AppController {
 	}
 
 	/**
-	 * This method returns the principal[user-name] of logged-in user.
+	 * Este metodo envia la informacion principal para un usuario logeado
 	 */
 	private String getPrincipal(){
 		String userName = null;
@@ -244,7 +238,7 @@ public class AppController {
 	}
 	
 	/**
-	 * This method returns true if users is already authenticated [logged-in], else false.
+	 * Este metodo envia TRUE si el usuario esta logeado, de lo contrario envia FALSE
 	 */
 	private boolean isCurrentAuthenticationAnonymous() {
 	    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
