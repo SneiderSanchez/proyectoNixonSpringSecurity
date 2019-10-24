@@ -1,8 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="windows-1252"%>
 <%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
-
 <html>
 
 <head>
@@ -216,6 +215,47 @@
         width: 100%;
         height: 100%;
     }
+        .main-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      background-color: #f5f5f5;
+      /* align-items: center; */
+    }
+
+    .list-container {
+      font-family: 'sans-serif';
+      margin-top: 40px;
+      width: 700px;
+      height: 400px;
+      padding: 50px;
+      background-color: white;
+      box-shadow: 5px 5px 5px rgba(0, 0, 0, .05);
+    }
+
+    .list-container h1 {
+      background-color: #7FD1B9;
+      color: white;
+      border-radius: 10px;
+      padding: 5px;
+      text-align: center;
+    }
+
+    .list-container table {
+      margin: 0 auto;
+    }
+
+    .list-container table th {
+      color: white;
+      background-color: #5E2BFF;
+    }
+
+    .list-container table td,
+    .list-container table th {
+      padding: 10px;
+      border: 1px solid rgba(0, 0, 0, .2);
+    }
     </style>
 </head>
 
@@ -224,35 +264,34 @@
 		
                 <sec:authorize access="hasRole('ADMIN')">
                     <%@include file="authheader.jsp" %>	
-		<div class="panel panel-default">
-			  <!-- Default panel contents -->
-		  	<div class="panel-heading"><span class="lead">List of Users </span></div>
-			<table class="table table-hover">
-	    		<thead>
-		      		<tr>
-				        <th>Firstname</th>
-				        <th>Lastname</th>
-				        <th>Email</th>
-				        <th>SSO ID</th>
-				        	<th width="100"></th>
-				        	<th width="100"></th>
-				        
-					</tr>
-		    	</thead>
-	    		<tbody>
-				<c:forEach items="${users}" var="user">
-					<tr>
-						<td>${user.firstName}</td>
-						<td>${user.lastName}</td>
-						<td>${user.email}</td>
-						<td>${user.ssoId}</td>
-							<td><a href="<c:url value='/edit-user-${user.ssoId}' />" class="btn btn-success custom-width">edit</a></td>
-							<td><a href="<c:url value='/delete-user-${user.ssoId}' />" class="btn btn-danger custom-width">delete</a></td>
-					</tr>
-				</c:forEach>
-	    		</tbody>
-	    	</table>
-		</div>
+  <div class="main-container">
+    <div class="list-container">
+      <h1>Lista de Usuarios</h1>
+      <table>
+        <thead>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Email</th>
+        </thead>
+        <tbody>
+          <c:forEach items="${users}" var="user">
+            <tr>
+              <td>${user.firstName}</td>
+              <td>${user.lastName}</td>
+              <td>${user.email}</td>
+              <sec:authorize access="hasRole('ADMIN')">
+                <td><a href="<c:url value='/delete-user-${user.ssoId}' />"
+                    class="btn btn-danger custom-width">delete</a></td>
+              </sec:authorize>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+      <sec:authorize access="hasRole('ADMIN')">
+      <a href="<c:url value='/newuser' />" class="btn btn-primary">Crear Usuario</a>
+      </sec:authorize>
+    </div>
+  </div>
                 		 	<div class="well">
 		 		<a href="<c:url value='/newuser' />">Add New User</a>
 		 	</div>
@@ -466,4 +505,133 @@
                 </sec:authorize>
    	</div>
 </body>
+ <script>
+    addEventListener("load", async function () {
+      const divContenedor = document.getElementById('listDonations')
+      try {
+        const response = await fetch('http://localhost:3031/api/donacion/allDonations');
+        const data = await response.json()
+        data.data.forEach(element => {
+          divContenedor.innerHTML += `          
+          <div class="card mb-3" style="">
+            <div class="row no-gutters">
+                <div class="col-md-12" id="alert-\${element.idDonacion}"></div>
+              <div class="col-md-4">
+                <img
+                  src="\${element.image}"
+                  class="card-img" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title"><strong>\${element.objeto}</strong></h5>
+                  <p class="card-text">\${element.descripcion}</p>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Donante: \${element.donante}</li>
+                    <li class="list-group-item">Ciudad: \${element.ciudad}</li>
+                    <li class="list-group-item">Estado: \${element.estado}</li>
+                    <li class="list-group-item " style="border-left: 5px solid \${element.disponible ? 'green' : 'red'}">\${element.disponible ? 'Disponible' : 'No disponible'}</li>
+                  </ul>
+                  <div class="card-body">
+                      <div class="button_cont" align="center">
+                        <a class="button" onClick="changeState(\${element.idDonacion});" style="background: \${element.disponible ? 'rgb(31, 119, 208)' : 'red'}">Apartar Donacion</a>
+                      </div>
+                  </div>
+                  <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                </div>
+              </div>
+            </div>
+          </div>`
+        });
+        console.log(data)
+        /*           var daString="<div id=\'block\' class=\'block\'><div class=\'block-2\'></div></div>";
+                  var daParent=document.getElementById("the ID of whatever your parent is goes in here");
+                  daParent.innerHTML=daString; */
+
+      } catch (error) {
+        console.log(error)
+      }
+    })
+    async function changeState(idDonacion) {
+      const contenedorAlerta = document.getElementById(`alert-\${idDonacion}`)
+      console.log("el conteneder")
+      console.log(contenedorAlerta)
+      const response = await fetch('http://localhost:3031/api/donacion/changeState', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          {
+            "id": idDonacion
+          })
+      });
+      const data = await response.json()
+      console.log(data)
+      if (data.error) {
+        contenedorAlerta.innerHTML += `          
+              <div class="alert">
+                  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                  <strong>Error!</strong> No se pudo cambiar el estado.
+              </div>`
+      } else {
+        contenedorAlerta.innerHTML += `          
+              <div class="alert" style="background-color: #4CAF50">
+                  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                  <strong>Completado!</strong> La donacion es tuya!!.
+              </div>`
+      }
+    }
+    
+  async function formPost() {
+            const divContenedor = document.getElementById('alertForm')
+            const objeto = document.getElementById('objeto').value
+            const donante = document.getElementById('donante').value
+            const estado = document.getElementById('estado').value
+            const descripcion = document.getElementById('descripcion').value
+            const direccion = document.getElementById('direccion').value
+            const ciudad = document.getElementById('ciudad').value
+            const image = document.getElementById('image').value
+            try {
+                const response = await fetch('http://localhost:3031/api/donacion/add', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(
+                        {
+                            "objeto": objeto,
+                            "donante": donante,
+                            "estado": estado,
+                            "descripcion": descripcion,
+                            "direccion": direccion,
+                            "ciudad": ciudad,
+                            "image": image
+                        })
+                });
+                const data = await response.json()
+                console.log(data)
+                if (data.error) {
+                    divContenedor.innerHTML += `          
+                    <div class="alert">
+                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                        <strong>Error!</strong> No se pudo agregar la donacion.
+                    </div>`
+                } else {
+                    divContenedor.innerHTML += `          
+                    <div class="alert" style="background-color: #4CAF50">
+                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                        <strong>Completado!</strong> Donacion Agregada.
+                    </div>`
+                }
+                /*           var daString="<div id=\'block\' class=\'block\'><div class=\'block-2\'></div></div>";
+                          var daParent=document.getElementById("the ID of whatever your parent is goes in here");
+                          daParent.innerHTML=daString; */
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    </script>
 </html>
